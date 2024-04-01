@@ -5,7 +5,6 @@ import com.project.lab.jwt.JwtTokenUtil;
 import com.project.lab.models.Users;
 import com.project.lab.repositories.UserRepository;
 import com.project.lab.responses.UniversalResponse;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -14,8 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,13 +21,11 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
-    public UniversalResponse response;
     public final UserRepository userRepository;
 
     public UniversalResponse login(AuthenticationDTO request) {
         try {
             Users user = userRepository.findUsersByEmail(request.getEmail());
-            System.out.println("Hey");
             if (user == null) {
                 log.info("User not found please register");
                 return UniversalResponse.builder().message("User not found please register").status("0").build();
