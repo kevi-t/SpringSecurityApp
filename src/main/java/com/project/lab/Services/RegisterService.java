@@ -23,7 +23,7 @@ public class RegisterService {
             if (userRepository.findUsersByEmail(request.getEmail()) != null) {
                 String email = request.getEmail();
                 return UniversalResponse.builder()
-                        .message("User with email"+email+"exists login")
+                        .message("User with email"+" "+email+ " "+ "exists login")
                         .status("0")
                         .build();
             }

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/security/")
 @AllArgsConstructor
-@Validated
 public class UserController {
 
     private final RegisterService registerService;

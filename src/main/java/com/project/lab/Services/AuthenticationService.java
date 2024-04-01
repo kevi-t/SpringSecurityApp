@@ -8,9 +8,11 @@ import com.project.lab.responses.UniversalResponse;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,27 +28,35 @@ public class AuthenticationService {
     public final UserRepository userRepository;
 
     public UniversalResponse login(AuthenticationDTO request) {
-//        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Users user = userRepository.findUsersByEmail(request.getEmail());
+            System.out.println("Hey");
+            if (user == null) {
+                log.info("User not found please register");
+                return UniversalResponse.builder().message("User not found please register").status("0").build();
+            }
+            else {
+                try {
+                    Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        if (request.getEmail() == null) {
-            log.info("User not found please register");
-            return UniversalResponse.builder().message("User not found please register").status("0").build();
+                    String jwt = jwtTokenUtil.createToken(request.getEmail());
+                    log.info("login successful");
+                    return UniversalResponse.builder().message("login successful").status("0").data(jwt).build();
+                }
+                catch (AuthenticationException e) {
+                    log.error("Authentication failed: " + e.getMessage());
+                    return UniversalResponse.builder().message("User or password incorrect").status("0").build();
+                }
+            }
         }
-//        else if (authentication == null) {
-//            return  UniversalResponse.builder().message("User or password incorrect").status("0").build();
-//        }
-        else {
-            String jwt = jwtTokenUtil.createToken(request.getEmail());
-            log.info("login successful");
-            return UniversalResponse.builder().message("login successful").status("0").data(jwt).build();
+        catch (DataAccessException e) {
+            log.error("Database access error: " + e.getMessage());
+            return UniversalResponse.builder().message("Database access error").status("1").build();
         }
-//        try {
-
-//        }
-//        catch (Exception exception){
-//            log.info("Login error" +exception);
-//
-//        }
+        catch (RuntimeException e) {
+            log.error("Unexpected error occurred: " + e.getMessage());
+            return UniversalResponse.builder().message("Unexpected error occurred").status("1").build();
+        }
     }
 }
