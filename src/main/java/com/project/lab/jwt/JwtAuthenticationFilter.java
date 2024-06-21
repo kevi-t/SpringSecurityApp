@@ -1,8 +1,6 @@
 package com.project.lab.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.lab.Services.CustomUserDetailsService;
-import com.project.lab.responses.UniversalResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
